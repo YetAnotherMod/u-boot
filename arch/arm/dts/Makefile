@@ -913,6 +913,8 @@ dtb-$(CONFIG_TARGET_1879VM8YA) += mc127-05.dtb
 
 dtb-$(CONFIG_TARGET_1888BC048) += mt143-05.dtb
 
+dtb-$(CONFIG_TARGET_1888BC048) += bivk-bc048.dtb
+
 targets += $(dtb-y)
 
 # Add any required device tree compiler flags here
