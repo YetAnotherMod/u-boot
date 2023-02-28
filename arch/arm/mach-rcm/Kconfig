@@ -25,3 +25,4 @@ endif
 
 source "board/rcm/mc127-05/Kconfig"
 source "board/rcm/mt143-05/Kconfig"
+

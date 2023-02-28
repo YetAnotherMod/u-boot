@@ -1,5 +1,9 @@
 if TARGET_1888BC048
 
+config BIVK_BC048
+	bool "Support BIVK"
+	default n
+
 config SYS_BOARD
 	default "mt143-05"
 

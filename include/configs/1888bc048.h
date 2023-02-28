@@ -40,8 +40,10 @@
 #define CONFIG_SYS_PL310_BASE	0x01106000
 #endif
 
-#define CONFIG_SYS_MMC_ENV_DEV 0
 
+#ifndef CONFIG_BIVK_BC048
+
+#define CONFIG_SYS_MMC_ENV_DEV 0
 #define CONFIG_USE_BOOTARGS
 #define CONFIG_BOOTARGS "root=/dev/mmcblk0p2 rootwait"
 #define CONFIG_IPADDR 192.168.1.5
@@ -63,4 +65,32 @@
 	"loadsd=run loadfdtsd; run loadkernelsd\0" \
 	"tftptimeout=1000\0" \
 	"tftptimeoutcountmax=100\0"
+
+#else
+
+#define CONFIG_SYS_MMC_ENV_DEV 1
+#define CONFIG_USE_BOOTARGS
+#define CONFIG_BOOTARGS "root=/dev/mmcblk1p2 rw rootwait console=ttyRCM0,115200"
+#define CONFIG_IPADDR 192.168.1.4
+#define CONFIG_SERVERIP 192.168.1.1
+#define CONFIG_NETMASK 255.255.0.0
+#define CONFIG_HOSTNAME "bc048"
+#define CONFIG_LOADADDR 80000000
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"bootcmd=run kernelsd\0" \
+	"bootfile=bc048/uImage\0" \
+	"fdt_addr_r=81000000\0" \
+	"hostname=bc048\0" \
+	"kernel=run loadfdt; run loadkernel; bootm ${loadaddr} - ${fdt_addr_r}\0" \
+	"kernelsd=run loadsd; bootm ${loadaddr} - ${fdt_addr_r}\0" \
+	"loadfdt=tftp ${fdt_addr_r} bc048/bc048.dtb\0" \
+	"loadfdtsd=ext4load mmc 1:2 ${fdt_addr_r} /boot/uImage-bc048.dtb\0" \
+	"loadkernel=tftp ${loadaddr} ${bootfile}\0" \
+	"loadkernelsd=ext4load mmc 1:2 ${loadaddr} /boot/uImage-bc048.bin\0" \
+	"loadsd=run loadfdtsd; run loadkernelsd\0" \
+	"tftptimeout=1000\0" \
+	"tftptimeoutcountmax=100\0"
+
+#endif
+
 #endif
