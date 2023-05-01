@@ -103,30 +103,28 @@ trap_init:
 // all traps  initiated by romboot
     blr
 
-// for TID=0, TS=0
 .global _invalidate_tlb_entry
 _invalidate_tlb_entry:
-	// set TID=0, TS=0
+	// set TID, TS according input arg
 	li r12, 0
-	mtspr SPR_MMUCR, r12
+	mtspr SPR_MMUCR, r4
 
-	tlbsx. r4, r0, r3      // [r3] - EA, [r4] - Way, Index
+	tlbsx. r5, r0, r3      // [r3] - EA, [r5] - Way, Index
 	bne    ite_end         // branch if not found
-	oris   r4, r4, 0x8000  // r4[0]=1, r4[4]=0
-	tlbwe  r3, r4, 0       // [r3] - EA[0:19], V[20], [r4]- Way[1:2], Index[8:15], index is NU
+	oris   r5, r5, 0x8000  // r5[0]=1, r5[4]=0
+	tlbwe  r3, r5, 0       // [r3] - EA[0:19], V[20], [r5]- Way[1:2], Index[8:15], index is NU
 ite_end:
-	or     r3, r4, r4      // return [r3]
+	or     r3, r5, r5      // return [r3]
 	
 	isync
 	msync
 	blr
 
-// for TID=0, TS=0
 .global _write_tlb_entry
 _write_tlb_entry:
-	// set TID=0, TS=0
+	// set TID, TS according input arg
 	li r12, 0
-	mtspr SPR_MMUCR, r12
+	mtspr SPR_MMUCR, r6
 
 	tlbwe r3, r12, 0
 	tlbwe r4, r12, 1
@@ -138,17 +136,21 @@ _write_tlb_entry:
 
 .global _read_tlb_entry
 _read_tlb_entry:
-	tlbsx. r5, r0, r3  // [r3] - EA, [r5] - Way, Index
+	// set TID, TS according input arg
+	mtspr SPR_MMUCR, r5
+
+	tlbsx. r6, r0, r3  // [r3] - EA, [r6] - Way, Index
 	bne    rte_nf      // branch if not found
 	
-	tlbre r3, r5, 0
+	mtspr SPR_MMUCR, r5
+	tlbre r3, r6, 0
 	stw   r3, 0(r4)
-	tlbre r3, r5, 1
+	tlbre r3, r6, 1
 	stw   r3, 4(r4)
-	tlbre r3, r5, 2
+	tlbre r3, r6, 2
 	stw   r3, 8(r4)
 
-	add r3, r0, r5
+	add r3, r0, r6
 	blr
 	
 rte_nf:
