@@ -105,6 +105,14 @@ static void print_tlb_entr_2(tlb_entr_2 * tlb, bool header)
 		printf("  __  ili ild u wimg  e  _ uxwr sxwr");
 }
 
+static void print_tlb_window(mem_window_t win, bool header)
+{
+	if ( ! header )
+		printf("  %04x", win);
+	else
+		printf(" stid");
+}
+
 typedef struct 
 {
 	uint32_t tlb_0;
@@ -122,14 +130,16 @@ static int mem_map_tlbs(void)
 	print_tlb_entr_0(NULL, true);
 	print_tlb_entr_1(NULL, true);
 	print_tlb_entr_2(NULL, true);
+	print_tlb_window(0, true);
 	printf("\n");
 	
 	s_tlb_cnt = -1;
-	uint32_t ea;
+	uint32_t ea, num;
 	const uint32_t dlt = 0x1 << 12;
+
 	for ( ea = 0x00000000; ea + dlt > ea; ea += dlt ) {
-		uint32_t tlb[3] = { 0, 0, 0 };	
-		uint32_t res = _read_tlb_entry(ea, tlb, 0);
+		uint32_t tlb[3] = { 0, 0, 0 };
+		uint32_t res = _read_tlb_entry(ea, tlb, MEM_WINDOW_SHARED);
 		if ( res != 0 && (s_tlb_cnt == -1 || s_tlb_arr[s_tlb_cnt].tlb_0 != tlb[0]) ) {
 			if ( ++ s_tlb_cnt == countof(s_tlb_arr) )
 				return -1;
@@ -139,8 +149,27 @@ static int mem_map_tlbs(void)
 			print_tlb_entr_0((tlb_entr_0 *) & tlb[0], false);
 			print_tlb_entr_1((tlb_entr_1 *) & tlb[1], false);
 			print_tlb_entr_2((tlb_entr_2 *) & tlb[2], false);
+			print_tlb_window(MEM_WINDOW_SHARED, false);
 			printf("\n");
-		}			
+		}
+	}
+	for (num = 0; num < 16; num++) {
+		for ( ea = 0x00000000; ea + dlt > ea; ea += dlt ) {
+			uint32_t tlb[3] = { 0, 0, 0 };
+			uint32_t res = _read_tlb_entry(ea, tlb, MEM_WINDOW_0 + num);
+			if ( res != 0 && (s_tlb_cnt == -1 || s_tlb_arr[s_tlb_cnt].tlb_0 != tlb[0]) ) {
+				if ( ++ s_tlb_cnt == countof(s_tlb_arr) )
+					return -1;
+				s_tlb_arr[s_tlb_cnt].tlb_0 = tlb[0];
+				s_tlb_arr[s_tlb_cnt].tlb_1 = tlb[1];
+				s_tlb_arr[s_tlb_cnt].tlb_2 = tlb[2];
+				print_tlb_entr_0((tlb_entr_0 *) & tlb[0], false);
+				print_tlb_entr_1((tlb_entr_1 *) & tlb[1], false);
+				print_tlb_entr_2((tlb_entr_2 *) & tlb[2], false);
+				print_tlb_window(MEM_WINDOW_0 + num, false);
+				printf("\n");
+			}
+		}
 	}
 	return 0;
 }
