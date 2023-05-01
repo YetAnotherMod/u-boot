@@ -1,0 +1,91 @@
+if TARGET_1888TX018_MALINA
+
+config SYS_BOARD
+	default "malina"
+
+config SYS_VENDOR
+	default "rcm"
+
+config SYS_CONFIG_NAME
+	default "1888tx018"
+
+config SYS_TEXT_BASE
+	hex "Entry point for u-boot startup"
+	default 0x4D000040
+
+config SPL_TEXT_BASE
+	hex "Entry point for SPL startup"
+	default 0x00040000
+
+config PPC_DCR
+    bool "Enable cotrol via DCR bus"
+	default y
+
+config SYS_DDR_BASE
+	hex "Base address DDR RAM memory"
+    default 0x40000000
+
+config ENV_SPI_MAX_HZ
+	int "Spi bus maximal frequency"
+	depends on ENV_IS_IN_SPI_FLASH
+	help
+		"Spi bus maximal frequency,can be lower"
+	default 12500000
+
+config ENV_ADDR
+	hex "Environment absolute address"
+	help
+		"Address of environment for nor flash"
+	depends on ENV_IS_IN_FLASH
+	default 0x21040000
+
+config ENV_OFFSET
+	hex "Environment offset"
+	help
+		Offset from base address where is environment of u-boot"
+	depends on ENV_IS_IN_NAND || ENV_IS_IN_FLASH || ENV_IS_IN_SPI_FLASH || ENV_IS_IN_MMC
+	default 0x40000 if ENV_IS_IN_NAND
+	default 0x1040000 if ENV_IS_IN_FLASH
+	default 0x140000 if ENV_IS_IN_SPI_FLASH
+	default 0xF0000 if ENV_IS_IN_MMC
+
+config ENV_SIZE
+	hex "Environment size"
+	help
+		"Size of enviroment of u-boot"
+	default 0x4000
+
+config ENV_SECT_SIZE
+	hex "Environment sector size"
+	help
+		"Size of sector of memory devices,where are storing data"
+	depends on ENV_IS_IN_NAND || ENV_IS_IN_FLASH || ENV_IS_IN_SPI_FLASH
+	default 0x20000 if ENV_IS_IN_NAND
+	default 0x40000 if ENV_IS_IN_FLASH
+	default 0x10000 if ENV_IS_IN_SPI_FLASH
+
+config PPC32
+	bool "Use in version>2020.04 for usb driver"
+	default y
+
+choice
+	prompt "First device for the bootloader image from SPL"
+
+config TARGET_1888TX018_MALINA_SPL_FIRST_DEVICE_MMC
+	bool "SD/MMC"
+	depends on MMC
+
+config TARGET_1888TX018_MALINA_SPL_FIRST_DEVICE_SPI_FLASH
+	bool "SPI-flash"
+	depends on SPI_FLASH
+
+config TARGET_1888TX018_MALINA_SPL_FIRST_DEVICE_NOR
+	bool "NOR"
+	depends on MTD_RCM_NOR
+
+config TARGET_1888TX018_MALINA_SPL_FIRST_DEVICE_UART_EDCL
+	bool "UART/EDCL"
+
+endchoice
+
+endif
