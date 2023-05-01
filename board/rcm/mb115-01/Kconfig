@@ -1,15 +1,12 @@
-if TARGET_1888TX018
+if TARGET_1888TX018_MB115_01
 
 config SYS_BOARD
-	string "Name of board"
 	default "mb115-01"
 
 config SYS_VENDOR
-	string "Vendor of board"
 	default "rcm"
 
 config SYS_CONFIG_NAME
-	string "Name of configuration"
 	default "1888tx018"
 
 config SYS_TEXT_BASE
@@ -74,19 +71,19 @@ config PPC32
 choice
 	prompt "First device for the bootloader image from SPL"
 
-config TARGET_1888TX018_SPL_FIRST_DEVICE_MMC
+config TARGET_1888TX018_MB115_01_SPL_FIRST_DEVICE_MMC
 	bool "SD/MMC"
 	depends on MMC
 
-config TARGET_1888TX018_SPL_FIRST_DEVICE_SPI_FLASH
+config TARGET_1888TX018_MB115_01_SPL_FIRST_DEVICE_SPI_FLASH
 	bool "SPI-flash"
 	depends on SPI_FLASH
 
-config TARGET_1888TX018_SPL_FIRST_DEVICE_NOR
+config TARGET_1888TX018_MB115_01_SPL_FIRST_DEVICE_NOR
 	bool "NOR"
 	depends on MTD_RCM_NOR
 
-config TARGET_1888TX018_SPL_FIRST_DEVICE_UART_EDCL
+config TARGET_1888TX018_MB115_01_SPL_FIRST_DEVICE_UART_EDCL
 	bool "UART/EDCL"
 
 endchoice

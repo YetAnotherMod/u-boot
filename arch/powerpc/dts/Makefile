@@ -16,7 +16,8 @@ dtb-$(CONFIG_TARGET_T2080RDB) += t2080rdb.dtb
 dtb-$(CONFIG_TARGET_T4240RDB) += t4240rdb.dtb
 dtb-$(CONFIG_TARGET_MCR3000) += mcr3000.dtb
 dtb-$(CONFIG_TARGET_GAZERBEAM) += gazerbeam.dtb
-dtb-$(CONFIG_TARGET_1888TX018) += mb115-01.dtb
+dtb-$(CONFIG_TARGET_1888TX018_MALINA) += malina.dtb
+dtb-$(CONFIG_TARGET_1888TX018_MB115_01) += mb115-01.dtb
 dtb-$(CONFIG_TARGET_1888BM18) += mt150-02.dtb
 
 targets += $(dtb-y)

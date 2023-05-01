@@ -20,6 +20,26 @@ config TARGET_1888BM18
 
 endchoice
 
+if TARGET_1888TX018
+
+choice
+	prompt "1888TX018 board select"
+
+config TARGET_1888TX018_MALINA
+	bool "malina"
+	help
+	  This option specifies support for the malina board.
+
+config TARGET_1888TX018_MB115_01
+	bool "MB115-01"
+	help
+	  This option specifies support for the MB115-01 board.
+
+endchoice
+
+endif
+
+source "board/rcm/malina/Kconfig"
 source "board/rcm/mb115-01/Kconfig"
 source "board/rcm/mt150-02/Kconfig"
 
