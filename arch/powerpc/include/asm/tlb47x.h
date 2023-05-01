@@ -1,7 +1,7 @@
 #ifndef TLB47X_H_
 #define TLB47X_H_
 
-#include <common.h>
+//#include <common.h>
 
 typedef enum 
 {
@@ -26,6 +26,27 @@ typedef enum
   TLB_MODE_WX  = 0x6,
   TLB_MODE_RWX = 0x7
 } tlb_rwx_mode;
+
+typedef enum
+{
+  MEM_WINDOW_SHARED = 0x0000,
+  MEM_WINDOW_0    = ( 0x8000 | 0 ),
+  MEM_WINDOW_1    = ( 0x8000 | 1 ),
+  MEM_WINDOW_2    = ( 0x8000 | 2 ),
+  MEM_WINDOW_3    = ( 0x8000 | 3 ),
+  MEM_WINDOW_4    = ( 0x8000 | 4 ),
+  MEM_WINDOW_5    = ( 0x8000 | 5 ),
+  MEM_WINDOW_6    = ( 0x8000 | 6 ),
+  MEM_WINDOW_7    = ( 0x8000 | 7 ),
+  MEM_WINDOW_8    = ( 0x8000 | 8 ),
+  MEM_WINDOW_9    = ( 0x8000 | 9 ),
+  MEM_WINDOW_10   = ( 0x8000 | 10 ),
+  MEM_WINDOW_11   = ( 0x8000 | 11 ),
+  MEM_WINDOW_12   = ( 0x8000 | 12 ),
+  MEM_WINDOW_13   = ( 0x8000 | 13 ),
+  MEM_WINDOW_14   = ( 0x8000 | 14 ),
+  MEM_WINDOW_15   = ( 0x8000 | 15 )
+} mem_window_t;
 
 typedef struct 
 {
@@ -74,12 +95,43 @@ typedef union
 	uint32_t   data;
 } tlb_entr_data_2;
 
+#define SPR_PID         48
 
-uint32_t _invalidate_tlb_entry(uint32_t tlb);
-void _write_tlb_entry(uint32_t tlb0, uint32_t tlb1, uint32_t tlb2, uint32_t zero);
-int _read_tlb_entry(uint32_t ea, uint32_t * tlb, uint32_t dummy);
+/*SPR access*/
+#define spr_write( spr_reg, value )\
+    asm volatile (\
+        "mtspr %1, %0 \n\t"\
+        ::"r"(value), "i"(spr_reg)\
+    )
+
+#define spr_read( spr_reg ) ({\
+    uint32_t rval = 0;\
+    asm volatile (\
+        "mfspr %0, %1 \n\t"\
+        :"=r"(rval)\
+        :"i"(spr_reg)\
+    );\
+    rval;\
+})
+
+inline void set_mem_window( mem_window_t const window ) {
+    spr_write( SPR_PID, window );
+    asm volatile (
+        "isync \n\t"
+    );
+}
+
+inline mem_window_t get_mem_window(void) {
+    return ( mem_window_t )spr_read( SPR_PID );
+}
+
+uint32_t _invalidate_tlb_entry(uint32_t tlb, uint32_t mmucr);
+void _write_tlb_entry(uint32_t tlb0, uint32_t tlb1, uint32_t tlb2, uint32_t mmucr);
+int _read_tlb_entry(uint32_t ea, uint32_t * tlb, uint32_t mmucr);
 
 void tlb47x_inval(uint32_t cpu_adr, tlb_size_id tlb_sid);
+
+void tlb47x_map_entry(uint64_t physical, uint32_t logical, uint32_t il1i, uint32_t il1d, uint32_t wimg, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode, mem_window_t window);
 
 void tlb47x_map_nocache(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode);
 void tlb47x_map_guarded(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode);
