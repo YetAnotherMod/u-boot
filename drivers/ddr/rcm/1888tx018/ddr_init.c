@@ -15,7 +15,7 @@
 #include "ddr_impl_h/ddr_impl.h"
 #include "ddr_impl_h/ddr_regs.h"
 #include "ddr_impl_h/mivem_assert.h"
-#include "ddr_impl_h/mivem_macro.h"
+//#include "ddr_impl_h/mivem_macro.h"
 #include "timer.h"
 #include "ddr_impl_h/ppc_476fp_lib_c.h"
 #include "ddr_impl_h/ddr/plb6mcif2.h"
@@ -24,6 +24,7 @@
 #include "ddr_spd.h"
 #include "rcm_dimm_params.h"
 #include "configs/1888tx018.h"
+#include <asm/tlb47x.h>
 
 //static uint8_t __attribute__((section(".EM0.data"),aligned(16))) volatile ddr0_init_array[128] = { 0 };
 //static uint8_t __attribute__((section(".EM1.data"),aligned(16))) volatile ddr1_init_array[128] = { 0 };
@@ -178,52 +179,6 @@ static void init_mmu(void)
 	"msync                  \n\t"  // 
 	:::
     );   
-};
-
-static void write_tlb_entry4(void)
-{
-
- asm volatile (
-	"addis 3, 0, 0x0000   \n\t"  // 0x0000, 0x0000
-	"addis 4, 0, 0x4000   \n\t"  // 0x8200, 0x0000
-	"ori   4, 4, 0x0bf0   \n\t"  // 0x08f0, 0x0BF0 04.04.2017 add_dauny
-	"tlbwe 4, 3, 0        \n\t"
-
-	"addis 4, 0, 0x0000   \n\t"  // 0x8200
-	"ori   4, 4, 0x0000   \n\t"  // 0x0000
-	"tlbwe 4, 3, 1        \n\t"
-
-	"addis 4, 0, 0x0003  \n\t"  // 0x0003, 0000
-	"ori   4, 4, 0x043f   \n\t"  // 0x043F, 023F
-	"tlbwe 4, 3, 2        \n\t"
-  "isync                  \n\t"  // 
-  "msync                  \n\t"  // 
-  :::
-  );
-
-};
-
-static void write_tlb_entry8(void)
-{
-
- asm volatile (
-	"addis 3, 0, 0x0000   \n\t"  // 0x0000, 0x0000
-	"addis 4, 0, 0x8000   \n\t"  // 0x8200, 0x0000
-	"ori   4, 4, 0x0bf0   \n\t"  // 0x08f0, 0x0BF0 04.04.2017 add_dauny
-	"tlbwe 4, 3, 0        \n\t"
-
-	"addis 4, 0, 0x0000   \n\t"  // 0x8200
-	"ori   4, 4, 0x0002   \n\t"  // 0x0000
-	"tlbwe 4, 3, 1        \n\t"
-
-	"addis 4, 0, 0x0003   \n\t"  // 0x0003, 0000
-	"ori   4, 4, 0x043f   \n\t"  // 0x043F, 023F
-	"tlbwe 4, 3, 2        \n\t"
-  "isync                  \n\t"  // 
-  "msync                  \n\t"  // 
-  :::
-  );
-
 };
 
 static uint32_t read_dcr_reg(uint32_t addr)
@@ -541,8 +496,14 @@ void ddr_init (int slowdown)
 #endif
 
     commutate_plb6();
-    write_tlb_entry4();
-    write_tlb_entry8();
+    //                  physical,       logical,  il1i, il1d, wimg,   size,        umode,        smode,       window
+    tlb47x_map_entry(0x0000000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
+    tlb47x_map_entry(0x0200000000ULL, 0x80000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
+
+    tlb47x_map_entry(0x0000000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_0);
+    tlb47x_map_entry(0x0040000000ULL, 0x80000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_0);
+    tlb47x_map_entry(0x0200000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_1);
+    tlb47x_map_entry(0x0240000000ULL, 0x80000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_1);
 
     if((slowdown==2) || (dimm0_params_invalid && dimm1_params_invalid))
     {
@@ -1473,7 +1434,8 @@ void ddr_ddr34lmc_init(const uint32_t baseAddr,
     // report_DDR_core_regs (baseAddr);
 }
 
-char * print_reg(uint32_t val, int len)
+#ifdef DEBUG
+static void print_reg(uint32_t val, int len)
 {
     uint32_t x = val, mask;
 
@@ -1494,6 +1456,7 @@ char * print_reg(uint32_t val, int len)
     printf("\n");
 
 }
+#endif
 
 // static void _ddr3phy_calibrate(const uint32_t baseAddr)
 // {
