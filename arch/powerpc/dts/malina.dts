@@ -1,0 +1,101 @@
+/*
+ * Device Tree Source for RCM Malina mainboard
+ *
+ * This file is licensed under the terms of the GNU General Public
+ * License version 2.  This program is licensed "as is" without
+ * any warranty of any kind, whether express or implied.
+ */
+
+#include "1888tx018.dtsi"
+
+/ {
+	config {
+		u-boot,spl-payload-offset = <0x40000>;
+	};
+
+	chosen {
+		stdout-path = "uart0";
+		spd0-path = "spd0";
+		spd1-path = "spd1";
+	};
+
+	aliases {
+		spi0 = &spi0;
+		mmc0 = &mmc0;
+		uart0 = &uart0;
+		spd0 = &spd0;
+		spd1 = &spd1;
+	};
+
+	sram_nor_arbiter0: sram_nor_arbiter {
+		status = "okay";
+		sram-nor-mux = <1>;      // 0 to route extmem wires to LSIF0, 1 - to MCIF
+		ext-mem-mux-mode = <2>;  // page 913 0-SRAM_NOR(used for NOR)), 1-NAND, GBIT_GRETH0,GBIT_GRETH1, 2-GRETH0,GRETH1,NAND(used for NAND)
+		ce-manage = <0>;         // LSIF: all cs=>1 controller, cs-mode=1, chip-num=0x10
+	};
+
+	lsif0 {
+		greth1: greth0@0x3C034000 {
+			status = "okay";
+			mac-address = [ EC 17 66 77 05 80 ];
+		};
+	};
+
+	lsif1 {
+		i2c0: i2c@0x3C05A000 {
+			status = "okay";
+			spd0: spd@50 {
+				status = "okay";
+			};
+			spd1: spd@51 {
+				status = "okay";
+			};
+		};
+
+		gpio0: gpio0@0x3C065000 {
+			status = "okay";
+		};
+
+		gpio1: gpio1@0x3C066000 {
+			status = "okay";
+		};
+
+		spi0: spi0@0x3C061000 {
+			status = "okay";
+
+			spi_flash@0 {
+				status = "okay";
+			};
+		};
+
+		spi1: spi1@0x3C062000 {
+			status = "okay";
+		};
+
+		uart0: uart0@3C05D000 {  // console
+			status = "okay";
+		};
+
+		uart1: uart1@3C05E000 {
+			status = "okay";
+		};
+
+		mmc0: mmc0@0x3C064000 {
+			status = "okay";
+			carddetect-gpio = <&gpio1 1 0>;
+		};
+
+		usb: musb@0x3C06D000 {
+			status = "okay";
+		};
+	};
+};
+
+// SRAM, NOR
+// /include/ "mb115-02.dtsi"
+
+// Ethernet, NAND
+// /include/ "mb115-03.dtsi"
+
+// AV ouput
+// /include/ "mb115-04.dtsi"
