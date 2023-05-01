@@ -15,6 +15,11 @@ int checkcpu(void)
     return 0;
 }
 
+int print_cpuinfo(void)
+{
+	return checkcpu();
+}
+
 void tlb47x_inval(uint32_t cpu_adr, tlb_size_id tlb_sid)
 {
 	tlb_entr_data_0 tlb_0;
@@ -24,11 +29,10 @@ void tlb47x_inval(uint32_t cpu_adr, tlb_size_id tlb_sid)
 	tlb_0.entr.ts = 0;
 	tlb_0.entr.dsiz = tlb_sid;
 		
-	_invalidate_tlb_entry(tlb_0.data);
+	_invalidate_tlb_entry(tlb_0.data, 0);
 }
 
-
-static void tlb47x_map_internal(uint64_t physical, uint32_t logical, uint32_t il1i, uint32_t il1d, uint32_t wimg, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode)
+void tlb47x_map_entry(uint64_t physical, uint32_t logical, uint32_t il1i, uint32_t il1d, uint32_t wimg, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode, mem_window_t window)
 {
 	tlb_entr_data_0 tlb_0;
 	tlb_0.data = 0x00000000;
@@ -52,25 +56,25 @@ static void tlb47x_map_internal(uint64_t physical, uint32_t logical, uint32_t il
     tlb_2.entr.uxwr = umode;     
     tlb_2.entr.sxwr = smode;     
 	
-	_write_tlb_entry(tlb_0.data, tlb_1.data, tlb_2.data, 0); 
+	_write_tlb_entry(tlb_0.data, tlb_1.data, tlb_2.data, window); 
 }
 
 void tlb47x_map_nocache(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode)
 {
-	tlb47x_map_internal(physical, logical, 1, 1, 0x4, size, umode, smode);
+	tlb47x_map_entry(physical, logical, 1, 1, 0x4, size, umode, smode, MEM_WINDOW_SHARED);
 }
 
 void tlb47x_map_guarded(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode)
 {
-	tlb47x_map_internal(physical, logical, 1, 1, 0x5, size, umode, smode);
+	tlb47x_map_entry(physical, logical, 1, 1, 0x5, size, umode, smode, MEM_WINDOW_SHARED);
 }
 
 void tlb47x_map_cached(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode)
 {
-	tlb47x_map_internal(physical, logical, 0, 0, 0x2, size, umode, smode);
+	tlb47x_map_entry(physical, logical, 0, 0, 0x2, size, umode, smode, MEM_WINDOW_SHARED);
 }
 
 void tlb47x_map_coherent(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode)
 {
-	tlb47x_map_internal(physical, logical, 1, 1, 0x2, size, umode, smode);
+	tlb47x_map_entry(physical, logical, 1, 1, 0x2, size, umode, smode, MEM_WINDOW_SHARED);
 }
