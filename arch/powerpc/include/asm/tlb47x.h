@@ -129,6 +129,8 @@ uint32_t _invalidate_tlb_entry(uint32_t tlb, uint32_t mmucr);
 void _write_tlb_entry(uint32_t tlb0, uint32_t tlb1, uint32_t tlb2, uint32_t mmucr);
 int _read_tlb_entry(uint32_t ea, uint32_t * tlb, uint32_t mmucr);
 
+int tlb47x_read_entry(uint32_t cpu_adr, uint32_t *valid, uint32_t *tsize, unsigned long *logical, phys_addr_t *physical);
+
 void tlb47x_inval(uint32_t cpu_adr, tlb_size_id tlb_sid);
 
 void tlb47x_map_entry(uint64_t physical, uint32_t logical, uint32_t il1i, uint32_t il1d, uint32_t wimg, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode, mem_window_t window);

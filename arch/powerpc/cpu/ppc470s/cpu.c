@@ -20,6 +20,24 @@ int print_cpuinfo(void)
 	return checkcpu();
 }
 
+int tlb47x_read_entry(uint32_t cpu_adr, uint32_t *valid, uint32_t *tsize, unsigned long *logical, phys_addr_t *physical)
+{
+	uint32_t tlb[3] = { 0, 0, 0 };
+	uint32_t ea = (cpu_adr >> 12);	
+
+	if (_read_tlb_entry(ea, tlb, MEM_WINDOW_SHARED))
+	{
+		tlb_entr_0 *tlb0 = (tlb_entr_0 *) &tlb[0];
+		tlb_entr_1 *tlb1 = (tlb_entr_1 *) &tlb[1];
+		*valid = tlb0->v;
+		*tsize = tlb47x_get_tlb_sid_size(tlb0->dsiz);
+		*logical = tlb0->epn << 12;
+		*physical = ((phys_addr_t)(tlb1->rpn) << 12) + ((phys_addr_t)(tlb1->erpn) << 32);
+		return 0;
+	}
+	return -1;
+}
+
 void tlb47x_inval(uint32_t cpu_adr, tlb_size_id tlb_sid)
 {
 	tlb_entr_data_0 tlb_0;
