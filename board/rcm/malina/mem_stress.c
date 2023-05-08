@@ -284,13 +284,15 @@ void arch_memory_failure_handle(void)
 	puts("DDR test failed!\n");
 }
 
+#if USE_DMA_FOR_TEST
 //*****************************************************************************
 //  Reverse byte order of uint32_t argument
 //*****************************************************************************
 static uint32_t rotate_be (uint32_t val)
 {
     return (((val>>24)&0x000000ff) | ((val>>8)&0x0000ff00) | ((val<<8)&0x00ff0000) | ((val<<24)&0xff000000));
-}  
+}
+#endif
 
 //*****************************************************************************
 //  Create reference data array for next transactions
@@ -426,7 +428,7 @@ static int pcie_dma_axi_axi(uint32_t dma_access_base, uint32_t src_addr_high, ui
 
     for (i=0; i<(size >> 2); i++)
     {
-        iowrite32(src[i], &dst[i]);
+        iowrite32(src[i],(uint32_t)&dst[i]);
     }
 #endif
     return 0;
