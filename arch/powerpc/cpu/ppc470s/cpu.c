@@ -78,3 +78,31 @@ void tlb47x_map_coherent(uint64_t physical, uint32_t logical, tlb_size_id size, 
 {
 	tlb47x_map_entry(physical, logical, 1, 1, 0x2, size, umode, smode, MEM_WINDOW_SHARED);
 }
+
+tlb_size_id tlb47x_get_tlb_sid_by_size(uint32_t size)
+{
+	if(size <= (4 * 1024)) return TLBSID_4K;
+	if(size <= (16 * 1024)) return TLBSID_16K;
+	if(size <= (64 * 1024)) return TLBSID_64K;
+	if(size <= (1 * 1024 * 1024)) return TLBSID_1M;
+	if(size <= (16 * 1024 * 1024)) return TLBSID_16M;
+	if(size <= (256 * 1024 * 1024)) return TLBSID_256M;
+	if(size <= (1 * 1024 * 1024 * 1024)) return TLBSID_1G;
+	return TLBSID_ERR;
+}
+
+const uint32_t tlb47x_get_tlb_sid_size(tlb_size_id tlb_sid)
+{
+	switch ( tlb_sid ) {
+	case TLBSID_4K :   return 4 * 1024;
+	case TLBSID_16K :  return 16 * 1024;
+	case TLBSID_64K :  return 64 * 1024;
+	case TLBSID_1M :   return 1 * 1024 * 1024;
+	case TLBSID_16M :  return 16 * 1024 * 1024;
+	case TLBSID_256M : return 256 * 1024 * 1024;
+	case TLBSID_1G :   return 1 * 1024 * 1024 * 1024;
+	default :
+		break;		
+	}
+	return 0;
+}
