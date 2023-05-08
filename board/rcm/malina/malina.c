@@ -242,9 +242,15 @@ int power_init_board(void)
 	return 0;
 }
 
-phys_size_t get_effective_memsize(void)	// clon of weak procedure from file common/memsize.c
+phys_size_t get_effective_memsize(void)
 {
+#ifndef CONFIG_VERY_BIG_RAM
 	return gd->ram_size;
+#else
+	/* limit stack to what we can reasonable map */
+	return ((gd->ram_size > CONFIG_MAX_MEM_MAPPED) ?
+		CONFIG_MAX_MEM_MAPPED : gd->ram_size);
+#endif 
 }
 
 int dram_init_banksize(void)
