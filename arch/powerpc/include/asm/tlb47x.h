@@ -138,4 +138,7 @@ void tlb47x_map_guarded(uint64_t physical, uint32_t logical, tlb_size_id size, t
 void tlb47x_map_cached(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode);
 void tlb47x_map_coherent(uint64_t physical, uint32_t logical, tlb_size_id size, tlb_rwx_mode umode, tlb_rwx_mode smode);
 
+tlb_size_id tlb47x_get_tlb_sid_by_size(uint32_t size);
+const uint32_t tlb47x_get_tlb_sid_size(tlb_size_id tlb_sid);
+
 #endif
