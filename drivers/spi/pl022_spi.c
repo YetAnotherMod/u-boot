@@ -15,6 +15,7 @@
  * Driver for ARM PL022 SPI Controller.
  */
 
+#include <config.h>
 #include <clk.h>
 #include <common.h>
 #include <dm.h>

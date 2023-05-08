@@ -6,6 +6,7 @@
  *  Copyright (C) 2020 Vladimir Shalyt <Vladimir.Shalyt@astrosoft.ru>
  */
 
+#include <config.h>
 #include <linux/types.h>
 #include <linux/io.h> 
 #include <linux/mtd/partitions.h>
