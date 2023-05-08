@@ -474,6 +474,27 @@ static void dump_ddr_config(void)
 }
 #endif
 
+void ddr_tlbs_init(void)
+{
+    phys_size_t ddr_size = ((phys_size_t)(CONFIG_1888TX018_DDR_EM0_SIZE + CONFIG_1888TX018_DDR_EM1_SIZE)) * SZ_1M;
+    phys_size_t p_size = (((ddr_size) > CONFIG_MAX_MEM_MAPPED) ? CONFIG_MAX_MEM_MAPPED : (ddr_size));
+    
+    uint32_t ddr0_base, ddr1_base, offset;
+    tlb_size_id tlb_sid = tlb47x_get_tlb_sid_by_size(p_size >> 1);
+    if(tlb_sid == TLBSID_ERR) tlb_sid = TLBSID_1G;
+
+    offset = tlb47x_get_tlb_sid_size(tlb_sid);
+    ddr0_base = CONFIG_SYS_DDR_BASE;
+    ddr1_base = CONFIG_SYS_DDR_BASE + offset;
+
+    ddr0_init_array = (void*)ddr0_base;
+    ddr1_init_array = (void*)ddr1_base;
+
+    //                  physical,                     logical,  il1i, il1d, wimg,  size,      umode,        smode,       window
+    tlb47x_map_entry(CONFIG_SYS_INIT_DDR0_ADDR_PHYS, ddr0_base,  0,    0,    4,   tlb_sid, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
+    tlb47x_map_entry(CONFIG_SYS_INIT_DDR1_ADDR_PHYS, ddr1_base,  0,    0,    4,   tlb_sid, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
+}
+
 void ddr_init (int slowdown)
 {
     int dimm0_params_invalid = 1;
@@ -496,10 +517,9 @@ void ddr_init (int slowdown)
 #endif
 
     commutate_plb6();
-    //                  physical,       logical,  il1i, il1d, wimg,   size,        umode,        smode,       window
-    tlb47x_map_entry(0x0000000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
-    tlb47x_map_entry(0x0200000000ULL, 0x80000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_SHARED);
+    ddr_tlbs_init();
 
+    //                  physical,       logical,  il1i, il1d, wimg,   size,        umode,        smode,       window
     tlb47x_map_entry(0x0000000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_0);
     tlb47x_map_entry(0x0040000000ULL, 0x80000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_0);
     tlb47x_map_entry(0x0200000000ULL, 0x40000000,  0,    0,    4,   TLBSID_1G, TLB_MODE_RWX,  TLB_MODE_RWX, MEM_WINDOW_1);
