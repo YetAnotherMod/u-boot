@@ -76,12 +76,21 @@ int arch_fixup_fdt(void *blob)
 
 phys_size_t get_physical_mem_size(void)
 {
+	phys_size_t result = 0;
+
+	#ifdef CONFIG_1888TX018_DDR_EM0_SIZE
+		ddr_em0_size = CONFIG_1888TX018_DDR_EM0_SIZE * SZ_1M;
+	#endif
+
+	#ifdef CONFIG_1888TX018_DDR_EM1_SIZE
+		ddr_em1_size = CONFIG_1888TX018_DDR_EM1_SIZE * SZ_1M;
+	#endif
+
+#ifdef CONFIG_1888TX018_DDR_SPD
 	int dimm0_params_invalid = 1;
 	int dimm1_params_invalid = 1;
 	dimm_params_t dpar0, dpar1;
-	phys_size_t result = 0;
 
-#ifdef CONFIG_SPD_EEPROM
 	ddr3_spd_eeprom_t spd;
 
 	if (!get_ddr3_spd_bypath("spd0-path", &spd))
@@ -101,9 +110,8 @@ phys_size_t get_physical_mem_size(void)
 		ddr_em1_size = dpar1.capacity * 32 / dpar0.primary_sdram_width;
 		result += ddr_em1_size;
 	}
-
 #else
-	result = CONFIG_SYS_DDR_SIZE;
+	result = ddr_em0_size + ddr_em1_size;
 #endif
 	return result;
 }
