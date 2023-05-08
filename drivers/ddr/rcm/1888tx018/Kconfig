@@ -8,7 +8,18 @@ config 1888TX018_DDR_SPD
 	depends on 1888TX018_DDR
 	bool "Initialize DDR timings from SPD"
 	help
-	  Enable DDR SDRAM controller for the 1888tx018 device.
+	  Use SPD to configure timings and size.
+
+config 1888TX018_DDR_EM0_SIZE
+	depends on !1888TX018_DDR_SPD
+	int "EM0 DDR Size (MiB)"
+	default 1024
+
+config 1888TX018_DDR_EM1_SIZE
+	depends on !1888TX018_DDR_SPD
+	int "EM1 DDR Size (MiB)"
+	default 1024
+
 
 choice 1888TX018_DDR_SPEED
     prompt "DDR3 Speed Selection"
