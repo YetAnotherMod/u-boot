@@ -37,6 +37,7 @@ extern int coprocessor_post_test(int flags);
 extern int led_post_test(int flags);
 extern int button_post_test(int flags);
 extern int memory_regions_post_test(int flags);
+extern int memory_stress_post_test(int flags);
 
 extern int sysmon_init_f (void);
 
@@ -298,6 +299,17 @@ struct post_test post_list[] =
 	CONFIG_SYS_POST_MEM_REGIONS
     },
 #endif
-};
-
+#if CONFIG_POST & CONFIG_SYS_POST_MEM_STRESS
+    {
+	"Memory stress test",
+	"mem_stress",
+	"This test checks RAM.",
+	POST_ROM | POST_POWERON | POST_PREREL,
+	&memory_stress_post_test,
+	NULL,
+	NULL,
+	CONFIG_SYS_POST_MEM_REGIONS
+    },
+#endif
+}
 unsigned int post_list_size = ARRAY_SIZE(post_list);

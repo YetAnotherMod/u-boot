@@ -99,6 +99,9 @@ bool is_ddr_ok(void)
 }
 
 void usleep(uint32_t usec);
+#if MAKE_STRESS_TEST
+int memory_stress_post_test(int flags);
+#endif
 
 void spl_board_init(void)
 {
@@ -120,6 +123,10 @@ void spl_board_init(void)
 #ifdef CONFIG_MTD_RCM_NOR
 	rcm_mtd_arbiter_init();
 	rcm_sram_nor_init();
+#endif
+
+#if MAKE_STRESS_TEST
+	memory_stress_post_test(0);
 #endif
 }
 

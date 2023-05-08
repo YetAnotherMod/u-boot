@@ -136,7 +136,7 @@
 #include <post.h>
 #include <watchdog.h>
 
-#if CONFIG_POST & (CONFIG_SYS_POST_MEMORY | CONFIG_SYS_POST_MEM_REGIONS)
+#if CONFIG_POST & (CONFIG_SYS_POST_MEMORY | CONFIG_SYS_POST_MEM_REGIONS | CONFIG_SYS_POST_MEM_STRESS)
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -529,6 +529,32 @@ int memory_post_test(int flags)
 		} else {			/* POST_NORMAL */
 			ret = memory_post_test_regions(vstart, memsize);
 		}
+	} while (!ret &&
+		!arch_memory_test_advance(&vstart, &memsize, &phys_offset));
+
+	arch_memory_test_cleanup(&vstart, &memsize, &phys_offset);
+	if (ret)
+		arch_memory_failure_handle();
+
+	return ret;
+}
+
+__attribute__((weak))
+int arch_memory_srtess_post_tests(unsigned long start, unsigned long size)
+{
+	return 0;
+}
+
+int memory_stress_post_test(int flags)
+{
+	int ret = 0;
+	phys_addr_t phys_offset = 0;
+	u32 memsize, vstart;
+
+	arch_memory_test_prepare(&vstart, &memsize, &phys_offset);
+
+	do {
+		ret = arch_memory_srtess_post_tests(vstart, memsize);
 	} while (!ret &&
 		!arch_memory_test_advance(&vstart, &memsize, &phys_offset));
 
