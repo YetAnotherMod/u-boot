@@ -337,11 +337,11 @@ int add_code_guard(void)
 	const uint32_t data_start = CONFIG_SYS_INIT_RAM_ADDR & ~0xFFFFFF;
 
 	// code
-	tlb47x_map_nocache(code_start - CONFIG_SYS_DDR_BASE, code_start, TLBSID_16M, TLB_MODE_NONE, TLB_MODE_RX);
+	tlb47x_map_nocache(code_start - CONFIG_SYS_SDRAM_BASE, code_start, TLBSID_16M, TLB_MODE_NONE, TLB_MODE_RX);
 	// data
-	tlb47x_map_nocache(data_start - CONFIG_SYS_DDR_BASE, data_start, TLBSID_16M, TLB_MODE_NONE, TLB_MODE_RW);
+	tlb47x_map_nocache(data_start - CONFIG_SYS_SDRAM_BASE, data_start, TLBSID_16M, TLB_MODE_NONE, TLB_MODE_RW);
 	// invalidate original page
-	tlb47x_inval(CONFIG_SYS_DDR_BASE, TLBSID_256M);
+	tlb47x_inval(CONFIG_SYS_SDRAM_BASE, TLBSID_256M);
 
 	return 0;
 }
