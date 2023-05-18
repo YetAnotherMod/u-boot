@@ -78,14 +78,6 @@ phys_size_t get_physical_mem_size(void)
 {
 	phys_size_t result = 0;
 
-	#ifdef CONFIG_1888TX018_DDR_EM0_SIZE
-		ddr_em0_size = ((phys_size_t)CONFIG_1888TX018_DDR_EM0_SIZE) * SZ_1M;
-	#endif
-
-	#ifdef CONFIG_1888TX018_DDR_EM1_SIZE
-		ddr_em1_size = ((phys_size_t)CONFIG_1888TX018_DDR_EM1_SIZE) * SZ_1M;
-	#endif
-
 #ifdef CONFIG_1888TX018_DDR_SPD
 	int dimm0_params_invalid = 1;
 	int dimm1_params_invalid = 1;
@@ -111,6 +103,13 @@ phys_size_t get_physical_mem_size(void)
 		result += ddr_em1_size;
 	}
 #else
+	#ifdef CONFIG_1888TX018_DDR_EM0_SIZE
+		ddr_em0_size = ((phys_size_t)CONFIG_1888TX018_DDR_EM0_SIZE) * SZ_1M;
+	#endif
+
+	#ifdef CONFIG_1888TX018_DDR_EM1_SIZE
+		ddr_em1_size = ((phys_size_t)CONFIG_1888TX018_DDR_EM1_SIZE) * SZ_1M;
+	#endif
 	result = ddr_em0_size + ddr_em1_size;
 #endif
 	return result;
@@ -258,11 +257,11 @@ int dram_init_banksize(void)
 #if defined(CONFIG_NR_DRAM_BANKS)
 	unsigned i = 1;
 	gd->bd->bi_dram[0].start = 0x0000000000;
-	gd->bd->bi_dram[0].size = ((phys_size_t)CONFIG_1888TX018_DDR_EM0_SIZE) * SZ_1M;
+	gd->bd->bi_dram[0].size = ddr_em0_size;
 
 	if (CONFIG_NR_DRAM_BANKS > 1) {
 		gd->bd->bi_dram[1].start = 0x0200000000;
-		gd->bd->bi_dram[1].size = ((phys_size_t)CONFIG_1888TX018_DDR_EM1_SIZE) * SZ_1M;
+		gd->bd->bi_dram[1].size = ddr_em1_size;
 		i = 2;
 	}
 	for (; i < CONFIG_NR_DRAM_BANKS; i++) {

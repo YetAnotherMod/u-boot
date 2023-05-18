@@ -476,7 +476,39 @@ static void dump_ddr_config(void)
 
 void ddr_tlbs_init(void)
 {
-    phys_size_t ddr_size = ((phys_size_t)(CONFIG_1888TX018_DDR_EM0_SIZE + CONFIG_1888TX018_DDR_EM1_SIZE)) * SZ_1M;
+    phys_size_t ddr_size = 0;
+#ifdef CONFIG_1888TX018_DDR_SPD
+	int dimm0_params_invalid = 1;
+	int dimm1_params_invalid = 1;
+	dimm_params_t dpar0, dpar1;
+
+	ddr3_spd_eeprom_t spd;
+
+	if (!get_ddr3_spd_bypath("spd0-path", &spd))
+		dimm0_params_invalid = rcm_compute_dimm_parameters(&spd, &dpar0, 0);
+
+	if (!get_ddr3_spd_bypath("spd1-path", &spd))
+		dimm1_params_invalid = rcm_compute_dimm_parameters(&spd, &dpar1, 1);
+
+	if (!dimm0_params_invalid)
+	{
+		ddr_size += dpar0.capacity * 32 / dpar0.primary_sdram_width;
+	}
+
+	if (!dimm1_params_invalid)
+	{
+		ddr_size += dpar1.capacity * 32 / dpar0.primary_sdram_width;
+	}
+#else
+	#ifdef CONFIG_1888TX018_DDR_EM0_SIZE
+		ddr_size += ((phys_size_t)CONFIG_1888TX018_DDR_EM0_SIZE) * SZ_1M;
+	#endif
+
+	#ifdef CONFIG_1888TX018_DDR_EM1_SIZE
+		ddr_size += ((phys_size_t)CONFIG_1888TX018_DDR_EM1_SIZE) * SZ_1M;
+	#endif
+#endif
+
     phys_size_t p_size = (((ddr_size) > CONFIG_MAX_MEM_MAPPED) ? CONFIG_MAX_MEM_MAPPED : (ddr_size));
     
     uint32_t ddr0_base, ddr1_base, offset;
