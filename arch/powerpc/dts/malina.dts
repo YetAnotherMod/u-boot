@@ -29,7 +29,7 @@
 
 	sram_nor_arbiter0: sram_nor_arbiter {
 		status = "okay";
-		sram-nor-mux = <1>;      // 0 to route extmem wires to LSIF0, 1 - to MCIF
+		sram-nor-mux = <0>;      // 0 to route extmem wires to LSIF0, 1 - to MCIF
 		ext-mem-mux-mode = <2>;  // page 913 0-SRAM_NOR(used for NOR)), 1-NAND, GBIT_GRETH0,GBIT_GRETH1, 2-GRETH0,GRETH1,NAND(used for NAND)
 		ce-manage = <0>;         // LSIF: all cs=>1 controller, cs-mode=1, chip-num=0x10
 	};
