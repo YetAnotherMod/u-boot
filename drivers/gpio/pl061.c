@@ -81,7 +81,7 @@ static int pl061_get_function(struct udevice *dev, unsigned pin)
 	struct pl061_platdata *plat = dev_get_platdata(dev);
 	struct pl061_regs *const regs = plat->regs;
 
-	if(readb(&regs->afsel) & (1 << pin))	// if software mode
+	if((readb(&regs->afsel) & (1 << pin)) == 0)	// if software mode
 	{
 		if(readb(&regs->dir) & (1 << pin))
 			return GPIOF_OUTPUT;
