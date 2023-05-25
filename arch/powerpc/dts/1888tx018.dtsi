@@ -36,17 +36,6 @@
 		status = "disbaled";
 		u-boot,dm-pre-reloc;
 		compatible = "rcm,sram-nor-arbiter";
-		pinctrl-names = "default";
-		pinctrl-0 =
-			<&lsif0_mgpio0_sram_nor>,
-			<&lsif0_mgpio1_sram_nor>,
-			<&lsif0_mgpio2_sram_nor>,
-			<&lsif0_mgpio3_sram_nor>,
-			<&lsif0_mgpio4_sram_nor>,
-			<&lsif0_mgpio5_sram_nor>,
-			<&lsif0_mgpio6_sram_nor>,
-			<&lsif0_mgpio7_sram_nor>,
-			<&lsif0_mgpio8_sram_nor>;
 		// sram-nor-mux = <1>;      // 0 to route extmem wires to LSIF0, 1 - to MCIF
 		// ext-mem-mux-mode = <2>;  // page 913 0-SRAM_NOR(used for NOR)), 1-NAND,GBIT_GRETH0,GBIT_GRETH1, 2-GRETH0,GRETH1,NAND(used for NAND)
 		// ce-manage = <0>;         // LSIF: all cs=>1 controller, cs-mode=1, chip-num=0x10
