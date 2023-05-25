@@ -179,12 +179,6 @@
 #define NAND_WADDR_EXTEND               0x28            // bits [3:0] - 4 highest address bits
 #define EXT_MEM_MUX_MODE                0x30            // controllers type selection for EXT_MEM pins
 
-// GPIO
-#define MGPIO3_GPIOAFSEL                0x3C043420      // 0xFF
-#define MGPIO4_GPIOAFSEL                0x3C044420      // 0x03
-#define MGPIO7_GPIOAFSEL                0x3C047420      // 0xF0
-#define MGPIO8_GPIOAFSEL                0x3C048420      // 0x83
-
 #define IOWRITE32(D,P)                  iowrite32(D,P)
 #define IOREAD32(P)                     ioread32(P)
 
@@ -1567,11 +1561,6 @@ MODULE_DESCRIPTION("RCM SoC NAND controller driver");
                 ( OOB_ECC << CTRL_REG_OOB_ECC_SHIFT ) |                                                                 \
                 ( OOB_SIZE << CTRL_REG_OOB_SIZE_SHIFT ) |                                                               \
                 ( COMMAND << CTRL_REG_FCMD_SHIFT ) )
-#define AFSEL_INIT                                                                                                      \
-        iowrite32( 0x000000FF, (void*)MGPIO3_GPIOAFSEL );                                                               \
-        iowrite32( 0x00000003, (void*)MGPIO4_GPIOAFSEL );                                                               \
-        iowrite32( 0x000000F0, (void*)MGPIO7_GPIOAFSEL );                                                               \
-        iowrite32( 0x00000083, (void*)MGPIO8_GPIOAFSEL );
 
 #define CHIPSIZE        (chip->size)                    // 0x8000000
 #define OOBSIZE         (chip->oob_size)                // 64
@@ -1605,14 +1594,12 @@ void nand_init( void ) {
         uint32_t n, m;
         SPL_DBG_PRINT( "%s: start\n", __FUNCTION__ )
 
-        WRLSIF0( 2, EXT_MEM_MUX_MODE );
         WRLSIF0( 1, NAND_RADDR_EXTEND );
         WRLSIF0( 1, NAND_WADDR_EXTEND );
         if( ( n = RDNAND( NAND_REG_id ) ) != RCM_NAND_CTRL_ID ) {
                 SPL_DBG_PRINT( "%s: bad_id(%08x)\n", __FUNCTION__, n )
                 return;
         }
-        AFSEL_INIT
 
         WRNAND( 0, NAND_REG_cntrl_sw_rst );
         WRNAND( 0, NAND_REG_sw_rst );
