@@ -1,27 +1,32 @@
 stages:
   - build
-  #- deploy
 
+variables:
+  IMAGE: "git.module.ru:5050/nm6408_soft/docker_images/keymaker:1.0"
+  GIT_REPO: "https://gitlab-ci-token:${CI_JOB_TOKEN}@git.module.ru/h3/linux-sdk/soc_config_tool"
+  CROSS_COMPILE: "arm-linux-gnueabihf-"
+  
+.build_template: &build_definition
+  stage: build
+  image: ${IMAGE}
 
 build-soc_config:
-  stage: build
-  image: git.module.ru:5050/nm6408_soft/docker_images/keymaker:1.0
+  <<: *build_definition
   script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@git.module.ru/h3/linux-sdk/soc_config_tool
+    - git clone ${GIT_REPO}
     - pip install rumboot-tools
     - make
   artifacts:
     paths:
-    - soc_config_tool/output/
+      - soc_config_tool/output/
 
 build-mt143-05:
-  stage: build
-  image: git.module.ru:5050/nm6408_soft/docker_images/keymaker:1.0
-  scipt:
-    - make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- mt143-05_defconfig
-    - make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- all
+  <<: *build_definition
+  script:
+    - make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} mt143-05_defconfig
+    - make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} all
     - rumboot-combine -a SD -i soc_config_tool/output/bivk.bin -i spl/u-boot-spl-dtb.rbi -i u-boot-dtb.img -o full_loader.bin
-    artifacts:
+  artifacts:
     paths:
-    - full_loader.bin
-    expire_in: 4 week
+      - full_loader.bin
+    expire_in: 4 weeks
