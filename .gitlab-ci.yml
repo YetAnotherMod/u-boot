@@ -14,6 +14,7 @@ build-soc_config:
   <<: *build_definition
   script:
     - git clone ${GIT_REPO}
+    - cd soc_config_tool/
     - pip install rumboot-tools
     - make
   artifacts:
