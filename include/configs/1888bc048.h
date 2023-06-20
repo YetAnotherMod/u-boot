@@ -45,7 +45,7 @@
 
 #define CONFIG_SYS_MMC_ENV_DEV 0
 #define CONFIG_USE_BOOTARGS
-#define CONFIG_BOOTARGS "root=/dev/mmcblk0p2 rootwait"
+#define CONFIG_BOOTARGS "root=/dev/mmcblk0p2 rw rootwait console=ttyRCM0,115200"
 #define CONFIG_IPADDR 192.168.1.5
 #define CONFIG_SERVERIP 192.168.1.2
 #define CONFIG_NETMASK 255.255.255.0
