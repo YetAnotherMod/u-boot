@@ -9,13 +9,12 @@ variables:
 .build_template: &build_definition
   stage: build
   image: ${IMAGE}
-  script:
-    - pip install rumboot-tools
 
 build-soc_config:
   <<: *build_definition
   script:
     - git clone ${GIT_REPO}
+    - pip install rumboot-tools
     - cd soc_config_tool/
     - make
   artifacts:
@@ -26,6 +25,7 @@ build-mt143-05:
   <<: *build_definition
   needs: [build-soc_config]
   script:
+    - pip install rumboot-tools
     - make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} mt143-05_defconfig
     - make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} all
     - rumboot-combine -a SD -i soc_config_tool/output/bivk.bin -i spl/u-boot-spl-dtb.rbi -i u-boot-dtb.img -o full_loader.bin
