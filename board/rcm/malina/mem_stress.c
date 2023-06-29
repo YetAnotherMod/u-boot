@@ -15,7 +15,7 @@
 #define DMA_ACCESS_BASE                     0x10500000
 #define TEST_DATA_SIZE                      0x400
 
-#define USE_DMA_FOR_TEST 0
+#define USE_DMA_FOR_TEST 1
 
 //NWL PCIe AXI registers
 #define BRIDGE_CORE_CFG_PCIE_RX1            0x00000004
