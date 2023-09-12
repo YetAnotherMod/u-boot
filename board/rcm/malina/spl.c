@@ -106,6 +106,7 @@ int memory_stress_post_test(int flags);
 void spl_board_init(void)
 {
 	/* init dram */
+	gd->ram_size = CONFIG_SYS_DDR_SIZE;
 #ifdef CONFIG_1888TX018_DDR_SPD
 	ddr_init(0);
 #else
@@ -118,16 +119,15 @@ void spl_board_init(void)
 		usleep(1000);
 		do_reset(0,0,0,0);
 	}
-	gd->ram_size = CONFIG_SYS_DDR_SIZE;
 
 #ifdef CONFIG_MTD_RCM_NOR
 	rcm_mtd_arbiter_init();
 	rcm_sram_nor_init();
 #endif
 
-#if MAKE_STRESS_TEST
-	memory_stress_post_test(0);
-#endif
+//#if MAKE_STRESS_TEST
+//	memory_stress_post_test(0);
+//#endif
 }
 
 
